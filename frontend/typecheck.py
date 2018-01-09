@@ -22,6 +22,7 @@ class TypeChecker(ASTVisitor):
         self.tbool = Type.get('bool')
         self.tchar = Type.get('char')
         self.tint = Type.get('int')
+        self.tfloat = Type.get('float') #! added float
         self.tvoid = Type.get('void')
         self.curfn = None
         self.in_loop = False
