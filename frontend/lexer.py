@@ -32,7 +32,7 @@ tokens = (
     'NOT', 'INV',
     'TYPE',
     'MODIFY',
-    'BOOLCONST', 'CHARCONST', 'INTCONST', 'HEXCONST',
+    'BOOLCONST', 'CHARCONST', 'INTCONST', 'HEXCONST', 'FLOATCONST', #! added Floatconst
     'STRINGCONST',
     'DOTS',
     'ID',
@@ -43,6 +43,7 @@ tokens = (
 reserved_map['bool']  = 'TYPE'
 reserved_map['char']  = 'TYPE'
 reserved_map['int']   = 'TYPE'
+reserved_map['float'] = 'TYPE' #! added 'float'
 reserved_map['void']  = 'TYPE'
 reserved_map['true']  = 'BOOLCONST'
 reserved_map['false'] = 'BOOLCONST'
@@ -94,6 +95,10 @@ def t_ID(t):
     t.type = reserved_map.get(t.value, 'ID')
     return t
 
+def t_float(t): #! added t_float
+    r'\d+(\.\d+)|\d+\.|\.\d+'
+    t.type = 'FLOATCONST'
+    return t
 
 def t_number(t):
     r'0x[a-fA-F0-9]+|\d+'
