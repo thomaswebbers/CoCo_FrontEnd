@@ -176,8 +176,8 @@ def p_dowhile(p): #added dowhile parser
     p[0] = ast.DoWhile(p[5], block(p[2])).at(loc(p)) #!? what are the variables of loc
 
 def p_for(p): #added for parser
-    '''statement : FOR LPAREN TYPE reference ASSIGN expr TO expr RPAREN statement'''  #!? worried about TYPE reference being a expression, when to check for int
-    p[0] = ast.For(p[4], p[6], p[8], block(p[10])).at(loc(p)) #!? other variables for loc?
+    '''statement : FOR LPAREN vardef TO expr RPAREN statement'''  #!? changed int ID = expr to vardef, check if correct
+    p[0] = ast.For(p[3], p[5], block(p[7])).at(loc(p)) #!? other variables for loc?
 
 def block(stat):
     if isinstance(stat, ast.Block):

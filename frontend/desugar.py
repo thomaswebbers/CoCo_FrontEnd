@@ -30,3 +30,12 @@ class Desugarer(ASTTransformer):
         # to:   lhs = lhs op rhs
         self.visit_children(m)
         return Assignment(m.ref, BinaryOp(m.ref, m.op, m.value)).at(m)
+
+    def visitFor(self, forNode): #! added Visitfor, how is desugarer called
+        # from: for(VARDEF to END) BLOCK
+        # to:   {VARDEF while (VARDEF.ID < END){ BLOCK ASSIGNMENT}
+        #       assignment: VARDEF.ID = VARDEF.ID + 1
+
+        self.visit_children(forNode) #!? how to give block multiple statements
+        return Block(forNode.start, While(BinaryOp(forNode.start.name, '<', forNode.end), Block(forNode.body, Assignment(forNode.start.name, BinaryOp(forNode.start.name, '+', 1)))
+        
