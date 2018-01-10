@@ -32,7 +32,7 @@ class TypeChecker(ASTVisitor):
             return [self.tbool]
 
         if operator.op == '%':
-            return [self.tchar, self.tint, self.tfloat] #added float
+            return [self.tchar, self.tint]
 
         if operator.is_arithmetic() or operator.is_relational():
             return [self.tchar, self.tint, self.tfloat] #added float
