@@ -9,6 +9,10 @@ from util import LocationError, FatalError
 precedence = (
     ('nonassoc', 'IF'),
     ('nonassoc', 'ELSE'),
+    ('nonassoc', 'WHILE'),
+    ('nonassoc', 'DO'), #added while, do, for, else
+    ('nonassoc', 'FOR'),
+    ('nonassoc', 'TO'),
     ('left', 'OR'),
     ('left', 'AND'),
     ('left', 'EQ', 'NE'),

@@ -14,7 +14,7 @@ states = (
 # added as tokens below, which are returned by `t_ID`
 reserved = (
     'extern', 'static',
-    'if', 'else',
+    'if', 'else', 'while', 'do', 'for','to', #!added while, do, for and to
     'return',
 )
 reserved_map = dict((word, word.upper()) for word in reserved)
