@@ -32,13 +32,13 @@ class TypeChecker(ASTVisitor):
             return [self.tbool]
 
         if operator.op == '%':
-            return [self.tchar, self.tint]
+            return [self.tchar, self.tint, self.tfloat] #added float
 
         if operator.is_arithmetic() or operator.is_relational():
-            return [self.tchar, self.tint]
+            return [self.tchar, self.tint, self.tfloat] #added float
 
         assert operator.is_equality()
-        return [self.tbool, self.tchar, self.tint]
+        return [self.tbool, self.tchar, self.tint, self.tfloat] #added float
 
     def check_type(self, node, *expected):
         if node.ty not in expected:
@@ -232,6 +232,9 @@ class TypeChecker(ASTVisitor):
 
     def visitIntConst(self, node):
         node.ty = self.tint
+    
+    def visitFloatConst(self, node): #added visitfloatconst
+        node.ty = self.tfloat
 
     def visitStringConst(self, node):
         node.ty = ArrayType.get(self.tchar)

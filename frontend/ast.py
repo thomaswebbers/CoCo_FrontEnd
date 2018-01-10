@@ -11,6 +11,7 @@ class Type(object):
     '''
     base_types = frozenset(['bool', 'char', 'int', 'void', 'float'])
     int_bits = 32
+    float_bits = 64
     cache = {}
 
     def __init__(self, name):
@@ -453,7 +454,7 @@ class IntConst(Const):
     def __str__(self):
         return str(self.value)
 
-class FloatConst(Const):  #!added FloatConst, definitely unsure here
+class FloatConst(Const):  #!added FloatConst, definitely unsure here. //checked later, it's correct
     children = ['value']
     types = dict(value='float')
 

@@ -257,7 +257,7 @@ def p_intconst(p):
 
 def p_floatconst(p): #! added floatconst
     '''expr : FLOATCONST'''
-    p[0] = ast.FloatConst(p[1]).at(loc(p))
+    p[0] = ast.FloatConst(float(p[1])).at(loc(p))
 
 
 def p_hexconst(p):
