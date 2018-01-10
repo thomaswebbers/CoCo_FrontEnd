@@ -167,6 +167,17 @@ def p_if(p):
     nobody = block(p[7]) if len(p) == 8 else None
     p[0] = ast.If(p[3], block(p[5]), nobody).at(loc(p, 1, 4))
 
+def p_while(p): #added while parser
+    '''statement : WHILE LPAREN expr RPAREN statement '''
+    p[0] = ast.While(p[3], block(p[5])).at(loc(p)) #!? what are the variables of loc
+
+def p_dowhile(p): #added dowhile parser
+    '''statement : DO statement WHILE LPAREN expr RPAREN SEMICOL '''
+    p[0] = ast.DoWhile(p[5], block(p[2])).at(loc(p)) #!? what are the variables of loc
+
+def p_for(p): #added for parser
+    '''statement : FOR LPAREN TYPE reference ASSIGN expr TO expr RPAREN statement'''  #!? worried about TYPE reference being a expression, when to check for int
+    p[0] = ast.For(p[4], p[6], p[8], block(p[10])).at(loc(p)) #!? other variables for loc?
 
 def block(stat):
     if isinstance(stat, ast.Block):

@@ -338,7 +338,7 @@ class While(Statement): #!added while node to ast tree
         s = 'while ({0.cond}) {0.body}'.format(self)
         return s
 
-class doWhile(Statement): #!added do while node to ast tree
+class DoWhile(Statement): #!added do while node to ast tree
     children = ['cond', 'body']
     types = dict(cond='Expression', body='Block')
 
@@ -346,9 +346,9 @@ class doWhile(Statement): #!added do while node to ast tree
         s = 'do {0.body} while ({0.cond});'.format(self)
         return s
 
-class for(Statement): #!added for node to ast tree
+class For(Statement): #!added for node to ast tree
     children = ['counter', 'start', 'end', 'body']
-    types = dict(counter='Id', start='Expression', end='Expression', body= 'Block')
+    types = dict(counter='Reference', start='Expression', end='Expression', body= 'Block') #!? counter = Reference? Ask later
 
     def __str__(self):
         s = 'for ( int {0.Id} = {0.start} to {0.end}) {0.body}'
