@@ -352,6 +352,7 @@ class For(Statement): #!added for node to ast tree
 
     def __str__(self):
         s = 'for ({0.start._type} {0.start.name} = {0.start.value} to {0.end}) {0.body}'
+        return s
 
 class Return(Statement):
     children = ['value']

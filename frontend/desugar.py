@@ -40,8 +40,8 @@ class Desugarer(ASTTransformer):
         self.visit_children(forNode)
 
         endVar = self.makevar("end")
-        endCheck = BinaryOp(forNode.start.name, '<', endVar)
-        incrCount =BinaryOp(forNode.start.name, '+', 1)
+        endCheck = BinaryOp(VarUse(forNode.start.name), Operator('<'), VarUse(endVar))
+        incrCount =BinaryOp(VarUse(forNode.start.name), Operator('+'), IntConst(1))
 
-        return Block([forNode.start, VarDef(Type('int'), endVar, forNode.end), While(endCheck), Block([forNode.body, Assignment(forNode.start.name, incrCount)])])
+        return Block([forNode.start, VarDef(Type.get('int'), endVar, forNode.end), While(endCheck, Block([forNode.body, Assignment(VarUse(forNode.start.name), incrCount)]))])
         
