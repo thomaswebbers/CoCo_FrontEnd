@@ -126,6 +126,51 @@ class IRGen(ASTTransformer):
     def visitModification(self, node):
         raise NotImplementedError  # should be desugared
 
+    def visitFor(self, node):
+        raise NotImplementedError  # should have been desugared
+
+    def visitWhile(self, node): #!implement
+        # make necessary blocks
+        prefix = self.builder.block.name
+        bwhile = self.add_block(prefix + '.while')
+        bdo = self.add_block(prefix + '.do')
+        bend = self.add_block(prefix + '.endwhile')
+
+        # insert instructions of while check
+        self.builder.branch(bwhile)
+        self.builder.position_at_start(bwhile)
+        cond = self.visit_before(node.cond, bdo)
+        self.builder.cbranch(cond, bdo, bend)
+
+        # build bdo
+        self.builder.position_at_start(bdo)
+        self.visit_before(node.body, bend)
+        self.builder.branch(bwhile)
+
+        # build bend
+        self.builder.position_at_start(bend)
+
+    def visitDoWhile(self, node): #!implement
+        # make necessary blocks
+        prefix = self.builder.block.name
+        bwhile = self.add_block(prefix + '.while')
+        bdo = self.add_block(prefix + '.do')
+        bend = self.add_block(prefix + '.endwhile')
+
+        # insert instructions of while check
+        self.builder.branch(bdo)
+        self.builder.position_at_start(bwhile)
+        cond = self.visit_before(node.cond, bdo)
+        self.builder.cbranch(cond, bdo, bend)
+
+        # build bdo
+        self.builder.position_at_start(bdo)
+        self.visit_before(node.body, bend)
+        self.builder.branch(bwhile)
+
+        # build bend
+        self.builder.position_at_start(bend)
+
     def visitIf(self, node):
         # first add the necessary basic blocks so that we can insert jumps to
         # them, use `visit_before` to make sure that any new basic blocks added

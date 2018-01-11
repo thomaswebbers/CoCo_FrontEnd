@@ -348,10 +348,10 @@ class DoWhile(Statement): #!added do while node to ast tree
 
 class For(Statement): #!added for node to ast tree
     children = ['start', 'end', 'body']
-    types = dict( start='VarDef', end='Expression', body= 'Block') #!? counter = Reference? Ask later
+    types = dict( start='VarDef', end='Expression', body= 'Block')
 
     def __str__(self):
-        s = 'for ( {0.start} to {0.end}) {0.body}'
+        s = 'for ({0.start._type} {0.start.name} = {0.start.value} to {0.end}) {0.body}'
 
 class Return(Statement):
     children = ['value']

@@ -1,6 +1,6 @@
 from util import ASTTransformer
 from ast import Type, Operator, VarDef, ArrayDef, Assignment, Modification, \
-        If, Block, VarUse, BinaryOp, IntConst, Return
+        If, Block, VarUse, BinaryOp, IntConst, Return, While
 
 
 class Desugarer(ASTTransformer):
@@ -33,9 +33,15 @@ class Desugarer(ASTTransformer):
 
     def visitFor(self, forNode): #! added Visitfor, how is desugarer called
         # from: for(VARDEF to END) BLOCK
-        # to:   {VARDEF while (VARDEF.ID < END){ BLOCK ASSIGNMENT}
+        # to:   {VARDEF VARDEF1 while (VARDEF.ID < "end"){ BLOCK ASSIGNMENT}
         #       assignment: VARDEF.ID = VARDEF.ID + 1
+        #       vardef1:    (int, "end", END)
 
-        self.visit_children(forNode) #!? how to give block multiple statements
-        return Block(forNode.start, While(BinaryOp(forNode.start.name, '<', forNode.end), Block(forNode.body, Assignment(forNode.start.name, BinaryOp(forNode.start.name, '+', 1)))
+        self.visit_children(forNode)
+
+        endVar = self.makevar("end")
+        endCheck = BinaryOp(forNode.start.name, '<', endVar)
+        incrCount =BinaryOp(forNode.start.name, '+', 1)
+
+        return Block([forNode.start, VarDef(Type('int'), endVar, forNode.end), While(endCheck), Block([forNode.body, Assignment(forNode.start.name, incrCount)])])
         

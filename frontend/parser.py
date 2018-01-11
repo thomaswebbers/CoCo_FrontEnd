@@ -9,10 +9,6 @@ from util import LocationError, FatalError
 precedence = (
     ('nonassoc', 'IF'),
     ('nonassoc', 'ELSE'),
-    ('nonassoc', 'WHILE'),
-    ('nonassoc', 'DO'), #added while, do, for, else
-    ('nonassoc', 'FOR'),
-    ('nonassoc', 'TO'),
     ('left', 'OR'),
     ('left', 'AND'),
     ('left', 'EQ', 'NE'),
@@ -169,15 +165,15 @@ def p_if(p):
 
 def p_while(p): #added while parser
     '''statement : WHILE LPAREN expr RPAREN statement '''
-    p[0] = ast.While(p[3], block(p[5])).at(loc(p)) #!? what are the variables of loc
+    p[0] = ast.While(p[3], block(p[5])).at(loc(p))
 
 def p_dowhile(p): #added dowhile parser
     '''statement : DO statement WHILE LPAREN expr RPAREN SEMICOL '''
-    p[0] = ast.DoWhile(p[5], block(p[2])).at(loc(p)) #!? what are the variables of loc
+    p[0] = ast.DoWhile(p[5], block(p[2])).at(loc(p))
 
 def p_for(p): #added for parser
-    '''statement : FOR LPAREN vardef TO expr RPAREN statement'''  #!? changed int ID = expr to vardef, check if correct
-    p[0] = ast.For(p[3], p[5], block(p[7])).at(loc(p)) #!? other variables for loc?
+    '''statement : FOR LPAREN type ID ASSIGN expr TO expr RPAREN statement'''
+    p[0] = ast.For(ast.VarDef(p[3], p[4], p[6]), p[8], block(p[10])).at(loc(p))
 
 def block(stat):
     if isinstance(stat, ast.Block):
