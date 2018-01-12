@@ -31,6 +31,13 @@ class Desugarer(ASTTransformer):
         self.visit_children(m)
         return Assignment(m.ref, BinaryOp(m.ref, m.op, m.value)).at(m)
 
+    def visitDoWhile(self, doNode):
+        # from: do{BODY} while(END)
+        # to:   BODY while(END){BODY}
+        self.visit_children(doNode)
+
+        return Block([doNode.body, While(doNode.cond, doNode.body)])
+
     def visitFor(self, forNode): #! added Visitfor, how is desugarer called
         # from: for(VARDEF to END) BLOCK
         # to:   {VARDEF VARDEF1 while (VARDEF.ID < "end"){ BLOCK ASSIGNMENT}
