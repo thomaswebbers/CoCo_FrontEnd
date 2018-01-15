@@ -175,6 +175,14 @@ def p_for(p): #added for parser
     '''statement : FOR LPAREN type ID ASSIGN expr TO expr RPAREN statement'''
     p[0] = ast.For(ast.VarDef(p[3], p[4], p[6]), p[8], block(p[10])).at(loc(p))
 
+def p_break(p): #added break parser
+    '''statement : BREAK SEMICOL'''
+    p[0] = ast.Break()
+
+def p_continue(p): #added continue parser
+    '''statement : CONTINUE SEMICOL'''
+    p[0] = ast.Continue()
+
 def block(stat):
     if isinstance(stat, ast.Block):
         return stat

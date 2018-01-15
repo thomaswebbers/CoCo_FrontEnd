@@ -129,7 +129,29 @@ class IRGen(ASTTransformer):
     def visitFor(self, node):
         raise NotImplementedError  # should have been desugared
 
-    def visitWhile(self, node): #!implement
+    def visitBreak(self, node): #! added visitBreak
+        prefix = self.builder.block.name
+        #self.builder.branch(prefix) #!! get prefix, currently in prefix.bdo , need to go to prefix.bend
+
+    def visitContinue(self, node): #! added visitContinue
+        prefix = self.builder.block.name
+
+        bcont = self.add_block(prefix+'.continue')
+        self.builder.branch(bcont)
+        self.builder.position_at_start(bcont)
+        
+        loopLocation = prefix.rfind('.do')
+        loopPrefix = prefix[:loopLocation]
+
+        print('\n',loopPrefix)
+        print('\n',loopPrefix+'.do')
+        print('\n',prefix)
+
+        self.builder.branch(loopPrefix+'.while')
+        self.builder.position_at_start(loopPrefix+'.while')
+        
+
+    def visitWhile(self, node): #!implemented
         # make necessary blocks
         prefix = self.builder.block.name
         bwhile = self.add_block(prefix + '.while')
@@ -150,8 +172,26 @@ class IRGen(ASTTransformer):
         # build bend
         self.builder.position_at_start(bend)
 
-    def visitDoWhile(self, node): #!implement
-        raise NotImplementedError  # should have been desugared
+    def visitDoWhile(self, node):
+        # make necessary blocks
+        prefix = self.builder.block.name
+        bwhile = self.add_block(prefix + '.while')
+        bdo = self.add_block(prefix + '.do')
+        bend = self.add_block(prefix + '.endwhile')
+
+        # insert instructions of while check
+        self.builder.branch(bdo)
+        self.builder.position_at_start(bwhile)
+        cond = self.visit_before(node.cond, bdo)
+        self.builder.cbranch(cond, bdo, bend)
+
+        # build bdo
+        self.builder.position_at_start(bdo)
+        self.visit_before(node.body, bend)
+        self.builder.branch(bwhile)
+
+        # build bend
+        self.builder.position_at_start(bend)
 
     def visitIf(self, node):
         # first add the necessary basic blocks so that we can insert jumps to
@@ -258,6 +298,9 @@ class IRGen(ASTTransformer):
             return self.visit(ast.BinaryOp(node.value, eq, false).at(node))
 
         if node.op == '-':
+            if(str(self.getty(node.ty)) == 'double'):
+                print(str(self.getty(node.ty)) == 'double')
+                self.builder.fsub(self.visit(ast.BinaryOp(0.0,ast.Operator.get('-'), node.value).at(node)))
             return self.builder.neg(self.visit(node.value))
 
         assert node.op == '~'
@@ -277,14 +320,26 @@ class IRGen(ASTTransformer):
             return self.lazy_conditional(node, node.lhs, yes, node.rhs)
 
         self.visit_children(node)
-
         if op.is_equality() or op.is_relational():
-            return b.icmp_signed(op.op, node.lhs, node.rhs)
+            if((str(node.lhs).find('double') != -1)): #make more elegant
+                if(str(node.lhs).find('NaN')):
+                    if(str(op) == '!='):
+                        return self.visit(self.makebool(True))
+                    else:
+                        return self.visit(self.makebool(False))
+                return b.fcmp_ordered(op.op, node.lhs, node.rhs)
+            else:
+                return b.icmp_signed(op.op, node.lhs, node.rhs)
+
+        if((str(self.getty(node.ty))=='double')): #added check for float
+            fcallbacks = {
+            '+': b.fadd, '-': b.fsub, '*': b.fmul, '/': b.fdiv, '%': b.frem}
+            return fcallbacks[op.op](node.lhs, node.rhs)
+
 
         callbacks = {
             '+': b.add, '-': b.sub, '*': b.mul, '/': b.sdiv, '%': b.srem
         }
-
         return callbacks[op.op](node.lhs, node.rhs)
 
     def lazy_conditional(self, node, cond, yesval, noval):
@@ -401,6 +456,9 @@ class IRGen(ASTTransformer):
     @staticmethod
     def getint(value, nbits=ast.Type.int_bits):
         return ir.Constant(ir.IntType(nbits), value)
+
+    def getfloat(value):
+        return ir.Constant(ir.DoubleType(), value)
 
     @staticmethod
     def makebool(value):

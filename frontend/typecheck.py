@@ -25,7 +25,7 @@ class TypeChecker(ASTVisitor):
         self.tfloat = Type.get('float') #! added float
         self.tvoid = Type.get('void')
         self.curfn = None
-        self.in_loop = False
+        self.loop_count = 0;
 
     def operand_types(self, operator):
         if operator.is_logical():
@@ -126,6 +126,31 @@ class TypeChecker(ASTVisitor):
 
     def visitModification(self, node):
         raise NotImplementedError  # should be desugared
+
+    def visitDoWhile(self, node):
+        raise NotImplementedError  # should have been desugared
+
+    def visitFor(self, node):
+        raise NotImplementedError  # should have been desugared
+
+    def visitWhile(self, node): #!added visitWhile
+        self.loop_count += 1
+        self.visit_children(node)
+        self.loop_count -= 1
+   
+    def visitDoWhile(self, node): #!added visitDoWhile
+        self.loop_count += 1
+        self.visit_children(node)
+        self.loop_count -= 1
+
+    def visitBreak(self, node): #! added visitBreak
+        if (self.loop_count <= 0):
+            raise NodeError(node, 'Error: break not in loop')
+
+    def visitContinue(self, node): #! added visitBreak
+        if (self.loop_count <= 0):
+            raise NodeError(node, 'Error: continue not in loop')
+        
 
     def visitIf(self, node):
         # condition must be bool

@@ -354,6 +354,22 @@ class For(Statement): #!added for node to ast tree
         s = 'for ({0.start._type} {0.start.name} = {0.start.value} to {0.end}) {0.body}'
         return s
 
+class Break(Statement): #!added break node to ast tree
+     children =[]
+     types = dict()
+     
+     def __str__(self):
+         s = 'break;' 
+         return s
+
+class Continue(Statement): #!added continue node to ast tree
+     children =[]
+     types = dict()
+     
+     def __str__(self):
+         s = 'continue;' #!? no semicolon in grammar
+         return s
+
 class Return(Statement):
     children = ['value']
     types = dict(value='Expression?')
