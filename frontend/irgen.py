@@ -131,24 +131,31 @@ class IRGen(ASTTransformer):
 
     def visitBreak(self, node): #! added visitBreak
         prefix = self.builder.block.name
-        #self.builder.branch(prefix) #!! get prefix, currently in prefix.bdo , need to go to prefix.bend
 
-    def visitContinue(self, node): #! added visitContinue
-        prefix = self.builder.block.name
-
-        bcont = self.add_block(prefix+'.continue')
-        self.builder.branch(bcont)
-        self.builder.position_at_start(bcont)
-        
         loopLocation = prefix.rfind('.do')
         loopPrefix = prefix[:loopLocation]
 
         print('\n',loopPrefix)
-        print('\n',loopPrefix+'.do')
+        print('\n',loopPrefix+'.endwhile')
+        print('\n',prefix)
+	
+        #self.builder.branch(self.builder.block) #loopPrefix.endwhile
+        self.builder.block.terminator = None
+
+
+    def visitContinue(self, node): #! added visitContinue
+        prefix = self.builder.block.name
+
+        loopLocation = prefix.rfind('.do')
+        loopPrefix = prefix[:loopLocation]
+
+        print('\n',loopPrefix)
+        print('\n',loopPrefix+'.while')
         print('\n',prefix)
 
-        self.builder.branch(loopPrefix+'.while')
-        self.builder.position_at_start(loopPrefix+'.while')
+
+        #self.builder.branch(self.builder.block) #loopPrefix.while
+        self.builder.block.terminator = None
         
 
     def visitWhile(self, node): #!implemented
