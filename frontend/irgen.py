@@ -299,8 +299,12 @@ class IRGen(ASTTransformer):
 
         if node.op == '-':
             if(str(self.getty(node.ty)) == 'double'):
-                print(str(self.getty(node.ty)) == 'double')
-                self.builder.fsub(self.visit(ast.BinaryOp(0.0,ast.Operator.get('-'), node.value).at(node)))
+                 
+                floatZero = ast.FloatConst(0.0)
+                floatZero.ty = ast.Type('float')
+                sub = ast.Operator.get('-')
+
+                return self.visit(ast.BinaryOp(floatZero, sub, node.value).at(node))
             return self.builder.neg(self.visit(node.value))
 
         assert node.op == '~'
