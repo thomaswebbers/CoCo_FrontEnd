@@ -33,7 +33,8 @@ class IRGen(ASTTransformer):
         self.nstrings = 0
         self.zero = self.getint(0)
         self.memset = None
-        self.loops = []
+        self.whileBlocks = []
+        self.endBlocks = []
 
     @classmethod
     def compile(cls, module_name, program):
@@ -130,31 +131,16 @@ class IRGen(ASTTransformer):
         raise NotImplementedError  # should have been desugared
 
     def visitBreak(self, node): #! added visitBreak
-        prefix = self.builder.block.name
+        endBlock = self.endBlocks[len(self.endBlocks)-1]        
 
-        loopLocation = prefix.rfind('.do')
-        loopPrefix = prefix[:loopLocation]
-
-        print('\n',loopPrefix)
-        print('\n',loopPrefix+'.endwhile')
-        print('\n',prefix)
-	
-        #self.builder.branch(self.builder.block) #loopPrefix.endwhile
+        self.builder.branch(endBlock) #loopPrefix.while
         self.builder.block.terminator = None
 
 
     def visitContinue(self, node): #! added visitContinue
-        prefix = self.builder.block.name
+        whileBlock = self.whileBlocks[len(self.whileBlocks)-1]        
 
-        loopLocation = prefix.rfind('.do')
-        loopPrefix = prefix[:loopLocation]
-
-        print('\n',loopPrefix)
-        print('\n',loopPrefix+'.while')
-        print('\n',prefix)
-
-
-        #self.builder.branch(self.builder.block) #loopPrefix.while
+        self.builder.branch(whileBlock) #loopPrefix.while
         self.builder.block.terminator = None
         
 
@@ -164,6 +150,10 @@ class IRGen(ASTTransformer):
         bwhile = self.add_block(prefix + '.while')
         bdo = self.add_block(prefix + '.do')
         bend = self.add_block(prefix + '.endwhile')
+
+        # add blocks to stack (for continue & break)
+        self.whileBlocks.append(bwhile)
+        self.endBlocks.append(bend)
 
         # insert instructions of while check
         self.builder.branch(bwhile)
@@ -179,12 +169,21 @@ class IRGen(ASTTransformer):
         # build bend
         self.builder.position_at_start(bend)
 
+        # remove blocks from stack (for continue & break)
+        self.whileBlocks.pop()
+        self.endBlocks.pop()
+
+
     def visitDoWhile(self, node):
         # make necessary blocks
         prefix = self.builder.block.name
         bwhile = self.add_block(prefix + '.while')
         bdo = self.add_block(prefix + '.do')
         bend = self.add_block(prefix + '.endwhile')
+
+        # add blocks to stack (for continue & break)
+        self.whileBlocks.append(bwhile)
+        self.endBlocks.append(bend)
 
         # insert instructions of while check
         self.builder.branch(bdo)
@@ -199,6 +198,11 @@ class IRGen(ASTTransformer):
 
         # build bend
         self.builder.position_at_start(bend)
+
+        # remove blocks from stack (for continue & break)
+        self.whileBlocks.pop()
+        self.endBlocks.pop()
+
 
     def visitIf(self, node):
         # first add the necessary basic blocks so that we can insert jumps to
