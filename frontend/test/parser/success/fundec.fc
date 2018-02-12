@@ -1,5 +1,0 @@
-extern void foo();
-
-extern void bar(int param);
-
-extern int printf(char[] format, ...);

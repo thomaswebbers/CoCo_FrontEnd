@@ -1,3 +1,0 @@
-void foo() {
-    int[10] int_array;
-}

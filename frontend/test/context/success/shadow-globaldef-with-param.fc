@@ -1,5 +1,0 @@
-int g = 1;
-
-void foo(bool g) {
-    g = true;
-}

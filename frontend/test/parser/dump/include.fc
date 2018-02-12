@@ -1,3 +1,0 @@
-#include "header.h"
-
-DEFINE_INT(x, 1)

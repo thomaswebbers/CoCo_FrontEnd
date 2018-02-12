@@ -1,5 +1,0 @@
-extern void sink(...);
-
-void foo(int i, float f) {
-    sink(i + f);
-}

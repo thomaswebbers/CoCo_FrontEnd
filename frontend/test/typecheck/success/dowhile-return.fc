@@ -1,6 +1,0 @@
-void foo(bool b) {
-    do {
-        return;
-    } while (b);
-    do return; while (b);
-}

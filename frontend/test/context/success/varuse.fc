@@ -1,5 +1,0 @@
-void foo() {
-    int[10] arr;
-    int i = 1;
-    arr[0] = i;
-}

@@ -1,5 +1,0 @@
-void foo(int i) {}
-
-void bar() {
-    foo(1, 2);
-}
